@@ -1,2 +1,2 @@
 # basic_socket
-A simple socket program, support SSl
+A simple socket program, support ssl
