@@ -1,4 +1,0 @@
-To do list:
-(1) If too long cannot connect: connect timeout!
-(2) Check for the message received from the server, make sure the message received is correct
-(3) Be careful if server keep sending me message. Set up limit.

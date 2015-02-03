@@ -1,3 +1,0 @@
-#!/bin/bash
-echo $*
-java -cp . project1.ScoketClient
