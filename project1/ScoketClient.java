@@ -8,91 +8,114 @@ import javax.net.ssl.SSLSocketFactory;
 
 public class ScoketClient
 {
-	String HELLO = "cs5700spring2015 HELLO ";
+	String PREFIX = "cs5700spring2015";
+	String HELLO;
 	String STATUS;
-	String SOLUTION = "cs5700spring2015 ";
+	String SOLUTION;
 	String BYE;
 
-	private ScoketClient(String ID, String host, int port, boolean SSL)
-			throws UnknownHostException, IOException
+	private ScoketClient(int port, boolean SSL, String host, String ID)
 	{
-		HELLO = HELLO + ID + "\n";
-		/*
-		 * System.out.println(ID); System.out.println(host);
-		 * System.out.println(port); System.out.println(SSL);
-		 */
-/*		System.out.println(host);
+		HELLO = PREFIX + " " + "HELLO" + " " + ID + "\n";
+/*		System.out.println(ID);
 		System.out.println(port);
+		System.out.println(host);
 		System.out.println(HELLO);*/
-		// SSLSocket sslClient;
 		if (!SSL)
 		{
 			Socket client = new Socket();
 			SocketAddress sockAddr = new InetSocketAddress(host, port);
-			client.connect(sockAddr, 1000); // Setup timeout 1s
-			socketApp(client);
+			try
+			{
+				client.connect(sockAddr, 1000);
+				socketApp(client);
+			}
+			catch (IOException e)
+			{
+				System.out.println("Cannot connect to the server!");
+				e.printStackTrace();
+			}
 		}
 		else
 		{
+			System.setProperty("javax.net.ssl.trustStore", "./kclient.keystore");
+			System.setProperty("javax.net.ssl.trustStorePassword", "qzmp1991327");
 			SSLSocketFactory sslsocketfactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
-			SSLSocket client = (SSLSocket) sslsocketfactory.createSocket();
-			SocketAddress sockAddr = new InetSocketAddress(host, port);
-			client.connect(sockAddr, 1000); // Setup timeout 1s
-			socketApp(client);
+			SSLSocket client;
+			try
+			{
+				client = (SSLSocket) sslsocketfactory.createSocket();
+				SocketAddress sockAddr = new InetSocketAddress(host, port);
+				client.connect(sockAddr, 1000);
+				socketApp(client);
+			}
+			catch (IOException e)
+			{
+				System.out.println("Cannot connect to the server!");
+				e.printStackTrace();
+			}
 		}
 	}
 
-	private void socketApp(SSLSocket client) throws IOException
+	private void socketApp(SSLSocket client)
 	{
-		Writer writer = new OutputStreamWriter(client.getOutputStream());
-		
-		//writer.write(stringToAscii(HELLO));
-		writer.flush();
-		Reader reader = new InputStreamReader(client.getInputStream());
-		int intValueOfChar;
-		client.setSoTimeout(10); // Time out timer: 10s
 		try
 		{
-			while ((intValueOfChar = reader.read()) != -1)
+			Writer writer = new OutputStreamWriter(client.getOutputStream());
+			// System.out.println("HELLO: " + HELLO);
+			writer.write(stringToAscii(HELLO));
+			writer.flush();
+			BufferedReader reader = new BufferedReader(new InputStreamReader(
+					client.getInputStream()));
+			String message;
+			while ((message = reader.readLine()) != null)
 			{
-				STATUS += (char) intValueOfChar;
+				if (isValidBye(message))
+				{
+					BYE = message;
+					writer.close();
+					reader.close();
+					client.close();
+					break;
+				}
+				else
+				{
+					STATUS = message;
+					String results = solveSolution(STATUS);
+					SOLUTION = PREFIX + " " + results + "\n";
+					writer.write(SOLUTION);
+					writer.flush();
+					SOLUTION = PREFIX + " ";
+				}
+			}
+			if (BYE == null)
+			{
+				throw new IllegalArgumentException("Program did not finish correctly");
+			}
+			else
+			{
+				System.out.println(BYE);
 			}
 		}
-		catch (SocketTimeoutException e)
+		catch (IOException e)
 		{
-			System.out.println("Timeout!");
+			System.out.println("Cannot write to or read from the server!");
+			e.printStackTrace();
 		}
-		intValueOfChar = 0; // reset message
-		// System.out.println("STATUS: " + STATUS);
-		String results = solveSolution(STATUS);
-		SOLUTION = SOLUTION + results + "\n";
-		System.out.println(SOLUTION);
-		// System.out.println("SOLUTION: " + SOLUTION);
-		writer.write(SOLUTION);
-		writer.flush();
-		try
-		{
-			while ((intValueOfChar = reader.read()) != -1)
-			{
-				BYE += (char) intValueOfChar;
-			}
-		}
-		catch (SocketTimeoutException e)
-		{
-			System.out.println("Timeout!");
-		}
-		if (isValidBye(BYE))
-		{
-			System.out.println("BYE: " + BYE);
-		}
-		writer.close();
-		reader.close();
-		client.close();
 	}
 
-	private String stringToAscii(String str) throws UnsupportedEncodingException
+	private String stringToAscii(String str)
 	{
-		byte[] bytes = str.getBytes("US-ASCII");
+		byte[] bytes = null;
+		try
+		{
+			bytes = str.getBytes("US-ASCII");
+		}
+		catch (UnsupportedEncodingException e)
+		{
+			System.out.println("HELLO message not follows ASCII standard");
+			e.printStackTrace();
+		}
 		if ((bytes == null) || (bytes.length == 0))
 		{
 			return "";
@@ -105,41 +128,51 @@ public class ScoketClient
 		return new String(ascii);
 	}
 
-	private void socketApp(Socket client) throws IOException
+	private void socketApp(Socket client)
 	{
-		Writer writer = new OutputStreamWriter(client.getOutputStream());
-		//System.out.println("HELLO: " + HELLO);
-		writer.write(stringToAscii(HELLO));
-		writer.flush();
-		BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
-		String message;
-		while ((message = reader.readLine()) != null)
+		try
 		{
-			if (isValidBye(message))
+			Writer writer = new OutputStreamWriter(client.getOutputStream());
+			// System.out.println("HELLO: " + HELLO);
+			writer.write(stringToAscii(HELLO));
+			writer.flush();
+			BufferedReader reader = new BufferedReader(new InputStreamReader(
+					client.getInputStream()));
+			String message;
+			while ((message = reader.readLine()) != null)
 			{
-				BYE = message;
-				writer.close();
-				reader.close();
-				client.close();
-				break;
+				if (isValidBye(message))
+				{
+					BYE = message;
+					writer.close();
+					reader.close();
+					client.close();
+					break;
+				}
+				else
+				{
+					STATUS = message;
+					String results = solveSolution(STATUS);
+					SOLUTION = PREFIX + " " + results + "\n";
+					writer.write(SOLUTION);
+					writer.flush();
+					SOLUTION = PREFIX + " ";
+				}
+			}
+			if (BYE == null)
+			{
+				throw new IllegalArgumentException(
+						"Program did not end correctly, please check hello message");
 			}
 			else
 			{
-				STATUS = message;
-				String results = solveSolution(STATUS);
-				SOLUTION = SOLUTION + results + "\n";
-				writer.write(SOLUTION);
-				writer.flush();
-				SOLUTION = "cs5700spring2015 ";
+				System.out.println(BYE);
 			}
 		}
-		if (BYE == null)
+		catch (IOException e)
 		{
-			throw new IllegalArgumentException("Program did not finish correctly");
-		}
-		else
-		{
-			System.out.println(BYE);
+			System.out.println("Cannot write to or read from the server!");
+			e.printStackTrace();
 		}
 	}
 
@@ -166,13 +199,13 @@ public class ScoketClient
 		if ((operator1 < 1 || operator1 > 1000) || (operator2 < 1 || operator2 > 1000))
 			throw new IllegalArgumentException("Invalid status (Operators out of bounds [1,1000])!");
 		if (tokens[3].equals("+"))
-			return Integer.toString((int)Math.floor(operator1 + operator2));
+			return Integer.toString((int) Math.floor(operator1 + operator2));
 		else if (tokens[3].equals("-"))
-			return Integer.toString((int)Math.floor(operator1 - operator2));
+			return Integer.toString((int) Math.floor(operator1 - operator2));
 		else if (tokens[3].equals("*"))
-			return Integer.toString((int)Math.floor(operator1 * operator2));
+			return Integer.toString((int) Math.floor(operator1 * operator2));
 		else if (tokens[3].equals("/"))
-			return Integer.toString((int)Math.floor(operator1 / operator2));
+			return Integer.toString((int) Math.floor(operator1 / operator2));
 		else
 			throw new IllegalArgumentException("Invalid status (Operation not acceptable)");
 	}
@@ -185,8 +218,10 @@ public class ScoketClient
 		}
 		String delims = "[ ]+";
 		String[] tokens = message.split(delims);
-		if (tokens.length != 3) return false;
-		if (!tokens[0].equals("cs5700spring2015") || !tokens[2].equals("BYE")) return false;
+		if (tokens.length != 3)
+			return false;
+		if (!tokens[0].equals("cs5700spring2015") || !tokens[2].equals("BYE"))
+			return false;
 		return true;
 	}
 
@@ -207,7 +242,18 @@ public class ScoketClient
 			return true;
 	}
 
-	public static void main(String[] args) throws UnknownHostException, IOException
+	private static int GetIndexOfArg(String[] args, String argument)
+	{
+
+		for (int i = 0; i < args.length; i++)
+		{
+			if (args[i].equals(argument))
+				return i;
+		}
+		return -1;
+	}
+
+	public static void main(String[] args)
 	{
 		if (args.length < 2)
 			throw new IllegalArgumentException("Please give me the host address and ID!");
@@ -215,23 +261,25 @@ public class ScoketClient
 		boolean SSL = false;
 		String ID = args[args.length - 1];
 		String host = args[args.length - 2];
-		if (args[0].equals("-p"))
+		int indexOfPort = GetIndexOfArg(args, "-p");
+		if (indexOfPort != -1)
 		{
-			if (!isValidPortNumber(args[1]))
+			if (!isValidPortNumber(args[indexOfPort + 1]))
 				throw new IllegalArgumentException("Invalid port number! (port number should be"
 						+ "an integer with range (1024, 65535])");
 			else
 			{
-				port = Integer.parseInt(args[1]);
+				port = Integer.parseInt(args[indexOfPort + 1]);
 			}
-			if (args[2].equals("-s"))
-			{
-				SSL = true;
-			}
+
 		}
-		else if (args[0].equals("-s"))
+		if (GetIndexOfArg(args, "-s") != -1)
 		{
 			SSL = true;
+		}
+		else
+		{
+			SSL = false;
 		}
 		if (port == -1)
 		{
@@ -245,6 +293,6 @@ public class ScoketClient
 
 			}
 		}
-		new ScoketClient(ID, host, port, SSL);
+		new ScoketClient(port, SSL, host, ID);
 	}
 }
