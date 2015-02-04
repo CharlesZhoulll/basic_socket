@@ -1,4 +1,4 @@
-# basic_socket WiKi
+# The first socket program
 [Project website](http://david.choffnes.com/classes/cs4700sp15/project1.php)
 
 Introduction
