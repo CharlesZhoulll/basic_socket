@@ -1,19 +1,23 @@
-# basic_socket
-Project website: http://david.choffnes.com/classes/cs4700sp15/project1.php
-GitHub website: https://github.com/CharlesZhoulll/basic_socket
+# basic_socket WiKi
+[Project website](http://david.choffnes.com/classes/cs4700sp15/project1.php)
+
+[GitHub website](https://github.com/CharlesZhoulll/basic_socket)
 
 Introduction
+============
 SocketClient is a simple client program. It achieve basic function of sending and receiving data with remote server. It first send a HELLO message to remote server. If HELLO message is correctly recognized, server will return several hundreds basic mathematical problems.  Client will be responsible for solving these problems and sent back results. If all results are correct, server will sent a BYE message and end this conversation.
 
 Install and Usage
-(1) Run make to install the program
+=================
+(1) Run `make` to install the program
 (2) Run ./client argument  to run the program,the argument list are as followings: 
 <-p> (optional): setting the port of remote server, default value: 27993 (no SSL) or 27994 (with SSL) 
 <-s> (optional): SSL enabled if set this parameter. SSL disabled otherwise
 [host] (required): remote host
 [ID] (required): student ID
 
-Implementation 
+Implementation
+==============
 The logical of this program is very simple:
 
 Read argument - Create socket - Start conversation
@@ -25,7 +29,9 @@ Create socket: Based on -s argument, we create normal socket or SSL socket. Then
 Start conversation: Here we call the socketApp function to start conversation between client and server. The idea is to keep receiving message sent from server, if it is a STATUS message, then solve the problem and sent SOLUTION back. This loop will be ended until receive a BYE message of a null message. Notice that if a null message received then it means either we sent the wrong message or server returns back a wrong message, and the program will terminate in either case. Besides, each message STATUS message will be checked to make sure it follows the format restricted. 
 
 Challenge
+=========
 (1) Create SSL socket 
+---------------------
 The way to create SSL socket is more complex than I had expected. First thing I do is to download certification of remoter server. Then I had to create a local keystore file and import the certificate into keystore. Finally in the program we using the following line to create SSL socket:
 
 System.setProperty("javax.net.ssl.trustStore", "./kclient.keystore");
@@ -35,6 +41,7 @@ SSLSocketFactory sslsocketfactory = (SSLSocketFactory) SSLSocketFactory
 client = (SSLSocket) sslsocketfactory.createSocket();
 
 (2) Code reuse
+--------------
 I want to reuse code for SSL and normal socket because I found after creating the socket instance, the next operations are exactly the same. I tried many methods to solve this problem, like using generic function. But after posting question on PIZZA, I got a surprisingly easy solution: cast SSLSockete to Socket. The code was like:
 
 private static Socket client = null;
@@ -48,6 +55,7 @@ else
 }
 
 (3) Check format of parameters
+------------------------------
 This code is not hard to write, but there are many details in it that we have to watch out. The first problem is which parameters to check? 
 
 The parameters used in problem can be generalized as: 
@@ -55,8 +63,8 @@ Arguments: port, SSL, host address, ID
 Message: HELLO, SOLUTION, STATUS, BYE
 
 Then for each parameter, our strategy is:
-port: We do check port to make sure that it is an number between 1024 and 65535
-SSL: We do not check it (there is no input)
+<strong>port</strong>: We do check port to make sure that it is an number between 1024 and 65535
+<strong>SSL</strong>: We do not check it (there is no input)
 host: We do not check it. But we do throw exception “cannot connect to server” if host is not right
 ID: We do not check it, as the result will show “Unknown husky ID” if it is not correct
  HELLO: we do not check it, as this is constructed by client
@@ -64,6 +72,7 @@ STATUS: we check it, making sure that it start with “cs5700spring2015 STATUS�
 BYE: we check it, making sure that it start with cs5700spring2015, end with “BYE”
 
 Test
+====
 Many tests are did to make sure the program runs well. Here we only generalize some of them:
 (1) Input argument test
 We use different input argument, change the order of arguments, and add more arguments to test if program crashes.
