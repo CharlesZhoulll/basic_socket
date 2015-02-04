@@ -9,7 +9,7 @@ Install and Usage
 =================
 1. Run `make` to install the program
 
-2. Run `./client` argument  to run the program,the argument list are as followings: 
+2. Run `./client`  to run the program,the argument list are as followings: 
 
 * -p (optional): setting the port of remote server, default value: 27993 (no SSL) or 27994 (with SSL) 
 
@@ -69,11 +69,17 @@ Message: HELLO, SOLUTION, STATUS, BYE
 Then for each parameter, our strategy is:
 
 <strong>port</strong>: We do check port to make sure that it is an number between 1024 and 65535
+
 <strong>SSL</strong>: We do not check it (there is no input)
+
 <strong>host</strong>: We do not check it. But we do throw exception “cannot connect to server” if host is not right
+
 <strong>ID</strong>: We do not check it, as the result will show “Unknown husky ID” if it is not correct
+
 <strong>HELLO</strong>: we do not check it, as this is constructed by client
+
 <strong>STATUS</strong>: we check it, making sure that it start with “cs5700spring2015 STATUS”, end with “\n” and the mathematical expression are valid
+
 <strong>BYE</strong>: we check it, making sure that it start with cs5700spring2015, end with “BYE”
 
 Test
