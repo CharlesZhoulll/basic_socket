@@ -2,11 +2,11 @@
 [Project website](http://david.choffnes.com/classes/cs4700sp15/project1.php)
 
 Introduction
-============
+------------
 SocketClient is a simple client program. It achieve basic function of sending and receiving data with remote server. It first send a HELLO message to remote server. If HELLO message is correctly recognized, server will return several hundreds basic mathematical problems.  Client will be responsible for solving these problems and sent back results. If all results are correct, server will sent a BYE message and end this conversation.
 
 Install and Usage
-=================
+-----------------
 1. Run `make` to install the program
 
 2. Run `./client`  to run the program,the argument list are as followings: 
@@ -20,7 +20,7 @@ Install and Usage
 * ID (required): student ID
 
 Implementation
-==============
+--------------
 The logical of this program is very simple:
 
 Read argument - Create socket - Start conversation
@@ -32,7 +32,7 @@ Read argument - Create socket - Start conversation
 <strong>Start conversation</strong>: Here we call the socketApp function to start conversation between client and server. The idea is to keep receiving message sent from server, if it is a STATUS message, then solve the problem and sent SOLUTION back. This loop will be ended until receive a BYE message of a null message. Notice that if a null message received then it means either we sent the wrong message or server returns back a wrong message, and the program will terminate in either case. Besides, each message STATUS message will be checked to make sure it follows the format restricted. 
 
 Challenge
-=========
+---------
 1. Create SSL socket 
 
 The way to create SSL socket is more complex than I had expected. First thing I do is to download certification of remoter server. Then I had to create a local keystore file and import the certificate into keystore. Finally in the program we using the following line to create SSL socket:
@@ -83,7 +83,7 @@ Then for each parameter, our strategy is:
 <strong>BYE</strong>: We check it, making sure that it start with cs5700spring2015, end with “BYE”
 
 Test
-====
+----
 Many tests are did to make sure the program runs well. Here we only generalize some of them:
 
 1. Input argument test
