@@ -9,7 +9,7 @@ Install and Usage
 =================
 1. Run `make` to install the program
 
-2. Run ./client argument  to run the program,the argument list are as followings: 
+2. Run `./client` argument  to run the program,the argument list are as followings: 
 
 * -p (optional): setting the port of remote server, default value: 27993 (no SSL) or 27994 (with SSL) 
 
@@ -33,28 +33,28 @@ Read argument - Create socket - Start conversation
 
 Challenge
 =========
-1.Create SSL socket 
+1. Create SSL socket 
 
 The way to create SSL socket is more complex than I had expected. First thing I do is to download certification of remoter server. Then I had to create a local keystore file and import the certificate into keystore. Finally in the program we using the following line to create SSL socket:
 
-`System.setProperty("javax.net.ssl.trustStore", "./kclient.keystore");
-System.setProperty("javax.net.ssl.trustStorePassword", "********");
-SSLSocketFactory sslsocketfactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
-client = (SSLSocket) sslsocketfactory.createSocket();`
+	System.setProperty("javax.net.ssl.trustStore", "./kclient.keystore");
+	System.setProperty("javax.net.ssl.trustStorePassword", "********");
+	SSLSocketFactory sslsocketfactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
+	client = (SSLSocket) sslsocketfactory.createSocket();
 
-2.Code reuse
+2. Code reuse
 
 I want to reuse code for SSL and normal socket because I found after creating the socket instance, the next operations are exactly the same. I tried many methods to solve this problem, like using generic function. But after posting question on PIZZA, I got a surprisingly easy solution: cast SSLSockete to Socket. The code was like:
 
-private static Socket client = null;
-`if (!SSL)
-{
-	client = new Socket();
-}
-else 
-{
-	client = (SSLSocket) sslsocketfactory.createSocket();
-}`
+	private static Socket client = null;
+	if (!SSL)
+	{
+		client = new Socket();
+	}
+	else 	
+	{
+		client = (SSLSocket) sslsocketfactory.createSocket();
+	}`
 
 3.Check format of parameters
 
@@ -80,16 +80,16 @@ Test
 ====
 Many tests are did to make sure the program runs well. Here we only generalize some of them:
 
-1.Input argument test
+1. Input argument test
 We use different input argument, change the order of arguments, and add more arguments to test if program crashes.
 
-2.Sending message test
+2. Sending message test
 We send server with messages that make no sense, to test what will the server do and how will client react.
 
-3.Receive message test
+3. Receive message test
 We overwrite the message receive from the server, to test what will client do when receive wrong message.
 
-4.Socket test
+4. Socket test
 We use different port, host address to test if the performance of socket. 
 
 
