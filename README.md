@@ -11,13 +11,13 @@ Install and Usage
 
 (2) Run ./client argument  to run the program,the argument list are as followings: 
 
-<-p> (optional): setting the port of remote server, default value: 27993 (no SSL) or 27994 (with SSL) 
+* -p (optional): setting the port of remote server, default value: 27993 (no SSL) or 27994 (with SSL) 
 
-<-s> (optional): SSL enabled if set this parameter. SSL disabled otherwise
+* -s (optional): SSL enabled if set this parameter. SSL disabled otherwise
 
-host (required): remote host
+* host (required): remote host
 
-ID (required): student ID
+* ID (required): student ID
 
 Implementation
 ==============
@@ -34,7 +34,7 @@ Read argument - Create socket - Start conversation
 Challenge
 =========
 (1) Create SSL socket 
----------------------
+
 The way to create SSL socket is more complex than I had expected. First thing I do is to download certification of remoter server. Then I had to create a local keystore file and import the certificate into keystore. Finally in the program we using the following line to create SSL socket:
 
 System.setProperty("javax.net.ssl.trustStore", "./kclient.keystore");
@@ -46,13 +46,13 @@ SSLSocketFactory sslsocketfactory = (SSLSocketFactory) SSLSocketFactory.getDefau
 client = (SSLSocket) sslsocketfactory.createSocket();
 
 (2) Code reuse
---------------
+
 I want to reuse code for SSL and normal socket because I found after creating the socket instance, the next operations are exactly the same. I tried many methods to solve this problem, like using generic function. But after posting question on PIZZA, I got a surprisingly easy solution: cast SSLSockete to Socket. The code was like:
 
 private static Socket client = null;
 if (!SSL)
 {
-client = new Socket();
+	client = new Socket();
 }
 else 
 {
@@ -60,7 +60,7 @@ else
 }
 
 (3) Check format of parameters
-------------------------------
+
 This code is not hard to write, but there are many details in it that we have to watch out. The first problem is which parameters to check? 
 
 The parameters used in problem can be generalized as: 
