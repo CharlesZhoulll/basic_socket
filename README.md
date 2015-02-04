@@ -76,11 +76,11 @@ Then for each parameter, our strategy is:
 
 <strong>ID</strong>: We do not check it, as the result will show “Unknown husky ID” if it is not correct
 
-<strong>HELLO</strong>: we do not check it, as this is constructed by client
+<strong>HELLO</strong>: We do not check it, as this is constructed by client
 
-<strong>STATUS</strong>: we check it, making sure that it start with “cs5700spring2015 STATUS”, end with “\n” and the mathematical expression are valid
+<strong>STATUS</strong>: We check it, making sure that it start with “cs5700spring2015 STATUS”, end with “\n” and the mathematical expression are valid
 
-<strong>BYE</strong>: we check it, making sure that it start with cs5700spring2015, end with “BYE”
+<strong>BYE</strong>: We check it, making sure that it start with cs5700spring2015, end with “BYE”
 
 Test
 ====
