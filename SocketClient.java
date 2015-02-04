@@ -1,4 +1,4 @@
-package simpleScoket;
+package simpleSocket;
 
 import java.io.*;
 import java.net.*;
@@ -6,100 +6,43 @@ import java.net.*;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
-public class ScoketClient
+public class SocketClient
 {
 	String PREFIX = "cs5700spring2015";
 	String HELLO;
 	String STATUS;
 	String SOLUTION;
 	String BYE;
+	private static Socket client = null;
 
-	private ScoketClient(int port, boolean SSL, String host, String ID)
+	private SocketClient(int port, boolean SSL, String host, String ID)
 	{
 		HELLO = PREFIX + " " + "HELLO" + " " + ID + "\n";
-/*		System.out.println(ID);
-		System.out.println(port);
-		System.out.println(host);
-		System.out.println(HELLO);*/
-		if (!SSL)
-		{
-			Socket client = new Socket();
-			SocketAddress sockAddr = new InetSocketAddress(host, port);
-			try
-			{
-				client.connect(sockAddr, 1000);
-				socketApp(client);
-			}
-			catch (IOException e)
-			{
-				System.out.println("Cannot connect to the server!");
-				e.printStackTrace();
-			}
-		}
-		else
-		{
-			System.setProperty("javax.net.ssl.trustStore", "./kclient.keystore");
-			System.setProperty("javax.net.ssl.trustStorePassword", "qzmp1991327");
-			SSLSocketFactory sslsocketfactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
-			SSLSocket client;
-			try
-			{
-				client = (SSLSocket) sslsocketfactory.createSocket();
-				SocketAddress sockAddr = new InetSocketAddress(host, port);
-				client.connect(sockAddr, 1000);
-				socketApp(client);
-			}
-			catch (IOException e)
-			{
-				System.out.println("Cannot connect to the server!");
-				e.printStackTrace();
-			}
-		}
-	}
-
-	private void socketApp(SSLSocket client)
-	{
+		/*
+		 * System.out.println(ID); System.out.println(port);
+		 * System.out.println(host); System.out.println(HELLO);
+		 */
 		try
 		{
-			Writer writer = new OutputStreamWriter(client.getOutputStream());
-			// System.out.println("HELLO: " + HELLO);
-			writer.write(stringToAscii(HELLO));
-			writer.flush();
-			BufferedReader reader = new BufferedReader(new InputStreamReader(
-					client.getInputStream()));
-			String message;
-			while ((message = reader.readLine()) != null)
+			if (!SSL)
 			{
-				if (isValidBye(message))
-				{
-					BYE = message;
-					writer.close();
-					reader.close();
-					client.close();
-					break;
-				}
-				else
-				{
-					STATUS = message;
-					String results = solveSolution(STATUS);
-					SOLUTION = PREFIX + " " + results + "\n";
-					writer.write(SOLUTION);
-					writer.flush();
-					SOLUTION = PREFIX + " ";
-				}
-			}
-			if (BYE == null)
-			{
-				throw new IllegalArgumentException("Program did not finish correctly");
+				client = new Socket();
 			}
 			else
 			{
-				System.out.println(BYE);
+				System.setProperty("javax.net.ssl.trustStore", "./kclient.keystore");
+				System.setProperty("javax.net.ssl.trustStorePassword", "*****");
+				SSLSocketFactory sslsocketfactory = (SSLSocketFactory) SSLSocketFactory
+						.getDefault();
+				client = (SSLSocket) sslsocketfactory.createSocket();
 			}
+			SocketAddress sockAddr = new InetSocketAddress(host, port);
+			client.connect(sockAddr, 1000);
+			socketApp(client);
 		}
 		catch (IOException e)
 		{
-			System.out.println("Cannot write to or read from the server!");
+			System.out.println("Cannot connect to the server!");
 			e.printStackTrace();
 		}
 	}
@@ -133,7 +76,6 @@ public class ScoketClient
 		try
 		{
 			Writer writer = new OutputStreamWriter(client.getOutputStream());
-			// System.out.println("HELLO: " + HELLO);
 			writer.write(stringToAscii(HELLO));
 			writer.flush();
 			BufferedReader reader = new BufferedReader(new InputStreamReader(
@@ -293,7 +235,6 @@ public class ScoketClient
 
 			}
 		}
-		new ScoketClient(port, SSL, host, ID);
+		new SocketClient(port, SSL, host, ID);
 	}
 }
-

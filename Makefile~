@@ -30,7 +30,7 @@ PACKAGE = simpleSocket
 	$(JC) $(JFLAGS) $*.java
 
 CLASSES = \
-	SocketClient.java \
+	ScoketClient.java \
 
 #
 # the default make target entry
